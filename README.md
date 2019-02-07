@@ -5,7 +5,7 @@ Correlates relationships between a Twitter user and their connections.
 Creates a blocklist.csv to import into your account to help amplify polarisation and drown out the noise.
 
 ```
-Usage: echo_chamber [options]
+Usage: Echo_Chamber [options]
     -s, --search SEARCHTYPE          Types: ["following","followers","all"]
     -t, --target PERSONALITY         Target twitter personality to produce list from
     -o, --output FILENAME            The filename which to store the generated CSV list
@@ -17,5 +17,5 @@ Usage: echo_chamber [options]
 ### Installation:
 ```
 gem install ocra
-ocra echo_chamber.rb --gem-all --console --add-all-core
+ocra Echo_Chamber.rb --gem-all --console --add-all-core
 ```
