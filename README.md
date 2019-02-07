@@ -19,26 +19,14 @@ Echo_Chamber [options]
     -p, --password PASSWORD          Your twitter password for Authentication
     -u, --username USERNAME          Your twitter username for Authentication
 ```
-
-### Output:
+### Example on Windows:
 ```
-type example_output.csv
-
-949919900469952512
-77810175
-860829795780775936
-15684556
-127038322
-1081707861863026688
-89466371
-1666562078
-987065018
-2428712008
-903253371041316865
-1193238781
-63619129
-870465760459718657
-940588450524418048
-821463887681875969
-
+c:\tmp> Echo_Chamber.exe -s followers -target SJWlibtard -o soyboys.csv -p CorrectHorseBatteryStaple -u TwitterAdmin
 ```
+![Image of Example](https://i.imgur.com/2HtPPu5.png)
+
+Go to https://twitter.com/settings/blocked and click the advanced options and navigate to the output folder of the .csv
+![Image of ImportDropdown](https://i.imgur.com/iNSmWJI.png)
+![Image of ImportBox](https://i.imgur.com/9eUEX1T.png)
+
+Enjoy a drama-free Twitter.
