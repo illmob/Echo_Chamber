@@ -22,7 +22,7 @@ Echo_Chamber [options]
 
 ### Output:
 ```
-type example_output.txt
+type example_output.csv
 
 949919900469952512
 77810175
