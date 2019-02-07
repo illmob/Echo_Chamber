@@ -21,11 +21,12 @@ Echo_Chamber [options]
 ```
 ### Example on Windows:
 ```
-c:\tmp> Echo_Chamber.exe -s followers -target SJWlibtard -o soyboys.csv -p CorrectHorseBatteryStaple -u TwitterAdmin
+Echo_Chamber.exe -s followers -target SJWlibtard -o soyboys.csv -p CorrectHorseBatteryStaple -u TwitterAdmin
 ```
-![Image of Example](https://i.imgur.com/2HtPPu5.png)
+![Image of Example](https://i.imgur.com/mNfLjPK.png)
 
-Go to https://twitter.com/settings/blocked and click the advanced options and navigate to the output folder of the .csv
+### Import Blocklist
+Go to https://twitter.com/settings/blocked Click Advanced Options/Import a list/Attach a file to upload/ and navigate to the output folder of your .csv
 ![Image of ImportDropdown](https://i.imgur.com/iNSmWJI.png)
 ![Image of ImportBox](https://i.imgur.com/9eUEX1T.png)
 
