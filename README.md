@@ -2,10 +2,17 @@
 Twitter relationship noise management application.
 
 Correlates relationships between a Twitter user and their connections. 
-Creates a blocklist.csv to import into your account to help amplify polarisation and drown out the noise.
+Creates a blocklist which can be imported into your twitter account 
+Useful towards amplifying polarisation and drown out the noisiness.
 
+### Installation:
 ```
-Usage: Echo_Chamber [options]
+gem install ocra
+ocra Echo_Chamber.rb --gem-all --console --add-all-core
+```
+### Usage:
+```
+Echo_Chamber [options]
     -s, --search SEARCHTYPE          Types: ["following","followers","all"]
     -t, --target PERSONALITY         Target twitter personality to produce list from
     -o, --output FILENAME            The filename which to store the generated CSV list
@@ -13,9 +20,25 @@ Usage: Echo_Chamber [options]
     -u, --username USERNAME          Your twitter username for Authentication
 ```
 
-
-### Installation:
+### Output:
 ```
-gem install ocra
-ocra Echo_Chamber.rb --gem-all --console --add-all-core
+type example_output.txt
+
+949919900469952512
+77810175
+860829795780775936
+15684556
+127038322
+1081707861863026688
+89466371
+1666562078
+987065018
+2428712008
+903253371041316865
+1193238781
+63619129
+870465760459718657
+940588450524418048
+821463887681875969
+
 ```
