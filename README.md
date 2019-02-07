@@ -1,4 +1,4 @@
-# Echo Chamber
+# Echo_Chamber
 Twitter relationship noise management application.
 
 Correlates relationships between a Twitter user and their connections. 
