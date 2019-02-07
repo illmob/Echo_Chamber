@@ -24,9 +24,9 @@ Echo_Chamber [options]
 ### CMD Example:
 ```
 RUBY
-  C:\Echo_Chamber.rb -s following -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
-  C:\Echo_Chamber.rb -s followers -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
-  C:\Echo_Chamber.rb -s all -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
+  C:\ruby Echo_Chamber.rb -s following -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
+  C:\ruby Echo_Chamber.rb -s followers -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
+  C:\ruby Echo_Chamber.rb -s all -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
 EXE
   C:\Echo_Chamber.exe -s following -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
   C:\Echo_Chamber.exe -s followers -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
