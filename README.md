@@ -21,7 +21,7 @@ Echo_Chamber [options]
 ```
 ### Example on Windows:
 ```
-Echo_Chamber.exe -s followers -target SJWlibtard -o soyboys.csv -p CorrectHorseBatteryStaple -u TwitterAdmin
+Echo_Chamber.exe -s followers -target SJWlibtard -o soyboys.csv -p CorrectHorseBattery -u TwitterAdmin
 ```
 ![Image of Example](https://i.imgur.com/mNfLjPK.png)
 
