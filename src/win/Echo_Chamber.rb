@@ -253,11 +253,11 @@ begin
   end  # end if statement
   if $searchtype.downcase.to_s == 'all'  # if searching for all
     TwitterAuth.twitter_user_followers($bsession, $targetuser)  # request followers page
-    TwitterAuth.twitter_get_followers($filename, $bsession, $hashfile, $targetuser, 'followers'
+    TwitterAuth.twitter_get_followers($filename, $bsession, $hashfile, $targetuser, $searchtype
     )  # page scroll and gather followers information, stow in hash
     filewriter($filename, $hashfile, $targetuser, 'followers')  # write list to disk
     TwitterAuth.twitter_user_following($bsession, $targetuser)  # request following page
-    TwitterAuth.twitter_get_following($filename, $bsession, $hashfile, $targetuser, 'following'
+    TwitterAuth.twitter_get_following($filename, $bsession, $hashfile, $targetuser, $searchtype
     )  # page scroll and gather following information, stow in hash
     filewriter($filename, $hashfile, $targetuser, 'following')  # write list to disk
   end  # end if statement
