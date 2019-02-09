@@ -42,6 +42,20 @@ class TwitterAuth  # class start TwitterAuth
     session.find_element(:css, "button.submit").click#, :return)  # send synthetic mouse click on button
     return session  # return session information
   end  # close function twitter_login_selenium
+  def self.twitter_userinfo(session, targetuser)  # start function twitter_userinfo
+    # gather target user info from browser session
+    session.get("https://twitter.com/#{targetuser}")  # request page from browser
+    return session.page_source  # return resulting page source
+  end  # close function twitter_user_followers_selenium
+  def self.twitter_get_userinfo(session, hashfile, targetuser, search_type) # start function twitter_get_userinfo
+    # extract details from followers
+    element = session.find_element(
+        xpath: '//*[@id="page-container"]/div[1]/div/div[1]/div[1]/img'
+    ).attribute('src')  # find target personalities user ID
+    hashfile[targetuser][search_type].store(
+        element.split("/")[-3], ""
+    )  # write target user to the hashfile
+  end  # close function twitter_get_userinfo
   def self.twitter_user_followers(session, targetuser)  # start function twitter_user_followers_selenium
     # gather followers from browser session
     session.get("https://twitter.com/#{targetuser}/followers")  # request page from browser
@@ -73,10 +87,7 @@ class TwitterAuth  # class start TwitterAuth
       if friendbio.to_s == ""; friendbio = "Unknown" end
       hashfile[targetuser][search_type].store(userid, [friendname, friendnick, friendavatar, friendbio])
     }  # iterate over each element finding relevant information
-    if filename  # if filename has been set, save userid to disk
-      File.open(search_type.to_s+"_"+filename.to_s, 'w') {|f|
-        f.puts(hashfile[targetuser][search_type].keys) }  # produce file
-    end  # close if statement
+    $hashfile = hashfile
   end  # close function twitter_get_followers_selenium
   def self.twitter_get_following(filename, session, hashfile, targetuser,
       search_type
@@ -97,10 +108,7 @@ class TwitterAuth  # class start TwitterAuth
       if friendbio.to_s == ""; friendbio = "Unknown" end
       hashfile[targetuser][search_type].store(userid, [friendname, friendnick, friendavatar, friendbio])
     }  # iterate over each element finding relevant information
-    if filename  # if filename has been set, save userid to disk
-      File.open(search_type.to_s+"_"+filename.to_s, 'w') {|f|
-        f.puts(hashfile[targetuser][search_type].keys) }  # produce file
-    end  # close if statement
+    $hashfile = hashfile
   end  # close function twitter_get_following_selenium
   def self.default_hash(targetuser)  # start function default_hash
     # identify if there is a file for a target to load from disk
@@ -184,6 +192,13 @@ else
      end  # end if statement
   end  #close function source_page_check
 end  # close class SeleniumWebHandler
+############################################# FILE WRITER ##############################################################
+def filewriter(filename, hashfile, targetuser, search_type)
+  if filename  # if filename has been set, save userid to disk
+    File.open(search_type.to_s+"_"+filename.to_s, 'w') {|f|
+      f.puts(hashfile[targetuser][search_type].keys) }  # produce file
+  end  # close if statement
+end
 #
 ########################################## USER ARGUMENTS ##############################################################
 #
@@ -222,37 +237,31 @@ $hashfile   = TwitterAuth.default_hash($targetuser)  # generate the default hash
 #
 begin
   TwitterAuth.twitter_login_selenium($bsession, $username, $password)  # log into the twitter web application
+  TwitterAuth.twitter_userinfo($bsession, $targetuser)  # get target personality information from page
+  TwitterAuth.twitter_get_userinfo($bsession, $hashfile, $targetuser, $searchtype)  # process personality info & stow
   if $searchtype.downcase.to_s == 'followers'  # if searching for followers only
-     TwitterAuth.twitter_user_followers(
-        $bsession, $targetuser
-     )  # request followers page
-     TwitterAuth.twitter_get_followers(
-        $filename, $bsession, $hashfile, $targetuser, $searchtype
-     )  # page scroll and gather followers information, stow in hash
+    TwitterAuth.twitter_user_followers($bsession, $targetuser)  # request followers page
+    TwitterAuth.twitter_get_followers($filename, $bsession, $hashfile, $targetuser, $searchtype
+    )  # page scroll and gather followers information, stow in hash
+    filewriter($filename, $hashfile, $targetuser, $searchtype)  # write list to disk
   end  # end if statement
   if $searchtype.downcase.to_s == 'following'  # if searching for following only
-     TwitterAuth.twitter_user_following(
-        $bsession, $targetuser
-     )  # request followers page
-     TwitterAuth.twitter_get_following(
-        $filename, $bsession, $hashfile, $targetuser, $searchtype
-     )  # page scroll and gather following information, stow in hash
+    TwitterAuth.twitter_user_following($bsession, $targetuser)  # request followers page
+    TwitterAuth.twitter_get_following($filename, $bsession, $hashfile, $targetuser, $searchtype
+    )  # page scroll and gather following information, stow in hash
+    filewriter($filename, $hashfile, $targetuser, $searchtype)  # write list to disk
   end  # end if statement
   if $searchtype.downcase.to_s == 'all'  # if searching for all
-     TwitterAuth.twitter_user_followers(
-        $bsession, $targetuser
-     )  # request followers page
-     TwitterAuth.twitter_get_followers(
-        $filename, $bsession, $hashfile, $targetuser, $searchtype
-     )  # page scroll and gather followers information, stow in hash
-     TwitterAuth.twitter_user_following(
-      $bsession, $targetuser
-     )  # request followers page
-     TwitterAuth.twitter_get_following(
-        $filename, $bsession, $hashfile, $targetuser, $searchtype
-     )  # page scroll and gather following information, stow in hash
+    TwitterAuth.twitter_user_followers($bsession, $targetuser)  # request followers page
+    TwitterAuth.twitter_get_followers($filename, $bsession, $hashfile, $targetuser, 'followers'
+    )  # page scroll and gather followers information, stow in hash
+    filewriter($filename, $hashfile, $targetuser, 'followers')  # write list to disk
+    TwitterAuth.twitter_user_following($bsession, $targetuser)  # request following page
+    TwitterAuth.twitter_get_following($filename, $bsession, $hashfile, $targetuser, 'following'
+    )  # page scroll and gather following information, stow in hash
+    filewriter($filename, $hashfile, $targetuser, 'following')  # write list to disk
   end  # end if statement
 rescue => mainfailed  # rescue any faults with parsing
   puts "Application Failed: #{mainfailed}"  # display error
 end  # stop being loop
-################################################# THE END ###############################################################
+################################################# THE END ##############################################################
