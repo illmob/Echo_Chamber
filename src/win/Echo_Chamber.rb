@@ -27,134 +27,349 @@
 # [ NOTEZ ]
 #   Developer is not responsible for others ignorance or arrogance
 #
-########################################################################################################################
+#[Class] ######################################] TwitterAuth [##########################################################
 class TwitterAuth  # class start TwitterAuth
+  if $diag; puts "[Class]:: Entering TwitterAuth"; end  # if diag true, display error
   # authenticate to Twitter web interface from FF browser
   def self.twitter_login_selenium(session, username, password)  # start function twitter_login_selenium
+    puts "\t[Function]:: Entering twitter_login_selenium" if $diag # if diag true, display error
     # Auth through headless FF with credential pair
-    session.get("https://twitter.com/login")  # actual login page for twitter
-    username_field = session.find_element(:css,'.js-username-field')  # find username element
-    username_field.send_keys(username)  # assign username to the form field
-    sleep(1)  # take a nap
-    password_field = session.find_element(:css, '.js-password-field')  # find password element
-    password_field.send_keys(password)  # assign password to the form field
-    sleep(1)  # take a nap
-    session.find_element(:css, "button.submit").click#, :return)  # send synthetic mouse click on button
+    begin  # Catch/Rescue block start
+      if $diag# if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_login_selenium::username #{username}"
+        puts "\t\t[Variable]:: TwitterAuth::twitter_login_selenium::password #{password}"
+        puts "\t[Function]:: Get auth page from twitter"
+      end  # end if block
+      session.get("https://twitter.com/login")  # actual login page for twitter
+      username_field = session.find_element(:css,'.js-username-field')  # find username element
+      puts "\t[Function]:: Find username field" if $diag # if diag true, display error
+      username_field.send_keys(username)  # assign username to the form field
+      puts "\t[Function]:: Send username to filed" if $diag # if diag true, display error
+      sleep(0.4)  # take a nap
+      password_field = session.find_element(:css, '.js-password-field')  # find password element
+      puts "\t[Function]:: Find password field" if $diag # if diag true, display error
+      password_field.send_keys(password)  # assign password to the form field
+      puts "\t[Function]:: Send password to field" if $diag # if diag true, display error
+      session.find_element(:css, "button.submit").click#, :return)  # send synthetic mouse click on button
+    rescue => tautherror  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_login_selenium fault: #{tautherror}" if $diag
+    end  # Catch/Rescue block end
+    begin  # Catch/Rescue block start
+      $username = ""  # clear username
+      username = ""  # clear username
+      # if diag true, display error
+      puts "\t\t[Variable]:: Global TwitterAuth::twitter_login_selenium::$username #{$username}" if $diag
+      puts "\t\t[Variable]:: Local TwitterAuth::twitter_login_selenium::username #{username}" if $diag
+      $password = ""  # clear password
+      password = ""  # clear password
+      # if diag true, display error
+      puts "\t\t[Variable]:: Global TwitterAuth::twitter_login_selenium::$password #{$password}" if $diag
+      puts "\t\t[Variable]:: Local TwitterAuth::twitter_login_selenium::password #{password}" if $diag
+    rescue => clearcredserror  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_login_selenium creds fault: #{clearcredserror}" if $diag
+    end  # Catch/Rescue block end
     return session  # return session information
   end  # close function twitter_login_selenium
   def self.twitter_userinfo(session, targetuser)  # start function twitter_userinfo
-    # gather target user info from browser session
-    session.get("https://twitter.com/#{targetuser}")  # request page from browser
-    return session.page_source  # return resulting page source
+    puts "\t[Function]:: Entering twitter_userinfo" if $diag # if diag true, display error
+    begin  # Catch/Rescue block start
+      # gather target user info from browser session
+      puts "\t[Function]:: Request target users page" if $diag # if diag true, display error
+      session.get("https://twitter.com/#{targetuser}")  # request page from browser
+      return session.page_source  # return resulting page source
+    rescue => tuserinfo  # Catch error to var
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_userinfo fault: #{tuserinfo}" if $diag # if diag true, display error
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Exiting twitter_userinfo" if $diag # if diag true, display error
   end  # close function twitter_user_followers_selenium
+  def self.twitter_get_selfinfo(session)
+    puts "\t[Function]:: Entering twitter_get_selfinfo" if $diag # if diag true, display error
+    begin  # Catch/Rescue block start
+      element = session.find_element(
+      xpath: '//*[@id="page-container"]/div[1]/div[1]/div/div[2]/span/a'
+      ).attribute('href')  # find target personalities user ID
+      puts "\t[Function]:: Get username for whitelist" if $diag # if diag true, display error
+      return element.split("/")[3]
+    rescue => tgetinfoerror  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_get_selfinfo fault: #{tgetinfoerror}" if $diag
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Entering twitter_get_selfinfo" if $diag # if diag true, display error
+  end  # close function twitter_get_selfinfo
   def self.twitter_get_userinfo(session, hashfile, targetuser, search_type) # start function twitter_get_userinfo
-    # extract details from followers
-    element = session.find_element(
+    if $diag  # if diag true, display error
+      puts "\t[Function]:: Entering twitter_get_userinfo"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_userinfo::hashfile #{hashfile.to_s}"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_userinfo::targetuser #{targetuser}"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_userinfo::search_type #{search_type}"
+    end  # end if block
+    begin  # Catch/Rescue block start
+      # extract details from followers
+      element = session.find_element(
         xpath: '//*[@id="page-container"]/div[1]/div/div[1]/div[1]/img'
-    ).attribute('src')  # find target personalities user ID
-    hashfile[targetuser][search_type].store(
+      ).attribute('src')  # find target personalities user ID
+      puts "\t[Function]:: Get userid from profile" if $diag # if diag true, display error
+      hashfile[targetuser][search_type].store(
         element.split("/")[-3], ""
-    )  # write target user to the hashfile
+      )  # write target user to the hashfile
+      # if diag true, display error
+      puts "\t\t[Variable]:: TwitterAuth::twitter_login_selenium::hashfile #{hashfile.to_s}" if $diag
+    rescue => tgetinfoerror  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_get_userinfo fault: #{tgetinfoerror}" if $diag
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Entering twitter_get_userinfo" if $diag # if diag true, display error
   end  # close function twitter_get_userinfo
   def self.twitter_user_followers(session, targetuser)  # start function twitter_user_followers_selenium
-    # gather followers from browser session
-    session.get("https://twitter.com/#{targetuser}/followers")  # request page from browser
-    SeleniumWebHandler.pagescroll(session)  # call pagescroll function, find page end
-    return session.page_source  # return resulting page source
+    if $diag # if diag true, display error
+      puts "\t[Function]:: Entering twitter_user_followers"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_user_followers::targetuser #{targetuser}"
+    end  # end if block
+    begin  # Catch/Rescue block start
+      # gather followers from browser session
+      session.get("https://twitter.com/#{targetuser}/followers")  # request page from browser
+      SeleniumWebHandler.pagescroll(session)  # call pagescroll function, find page end
+      puts "\t[Function]:: Scroll followers page ended" if $diag # if diag true, display error
+      return session.page_source  # return resulting page source
+    rescue => tuserinfoerror  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_get_userinfo fault: #{tuserinfoerror}" if $diag
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Exiting twitter_get_userinfo" if $diag # if diag true, display error
   end  # close function twitter_user_followers_selenium
   def self.twitter_user_following(session, targetuser)  # start function twitter_user_following_selenium
-    # gather following from browser session
-    session.get("https://twitter.com/#{targetuser}/following")  # request page from browser
-    SeleniumWebHandler.pagescroll(session)  # call pagescroll function, find page end
-    return session.page_source  # return resulting page source
+    if $diag # if diag true, display error
+      puts "\t[Function]:: Entering twitter_user_following"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_user_following::targetuser #{targetuser}"
+    end  # end if block
+    begin  # Catch/Rescue block start
+      # gather following from browser session
+      session.get("https://twitter.com/#{targetuser}/following")  # request page from browser
+      SeleniumWebHandler.pagescroll(session)  # call pagescroll function, find page end
+      puts "\t[Function]:: Scroll following page ended" if $diag # if diag true, display error
+      return session.page_source  # return resulting page source
+    rescue => tuserfolerr  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_user_following fault: #{tuserfolerr}" if $diag
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Exiting twitter_user_following" if $diag # if diag true, display error
   end  # close function twitter_user_following_selenium
-  def self.twitter_get_followers(filename, session, hashfile, targetuser,
-      search_type
-  ) # start function twitter_get_followers_selenium
-    # extract details from followers
-    element = session.find_elements(:xpath, "//*[starts-with(@id, 'stream-item-user-')]")  # find userid element
-    element.select { |everything|
-      userid = everything.attribute('data-item-id')
-      friendnick = everything.find_element(:css,
-          'div > div > div.ProfileCard-userFields > div > div > a'
-      ).attribute('href').to_s
-      if friendnick.to_s == ""; friendnick = "Unknown" end
-      friendavatar = everything.find_element(:css, 'div > div > a > img').attribute('src')
-      if friendavatar.to_s == ""; friendavatar = "Unknown" end
-      friendname = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > div > div > a').text
-      if friendname.to_s == ""; friendname = "Unknown" end
-      friendbio = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > p').text
-      if friendbio.to_s == ""; friendbio = "Unknown" end
-      hashfile[targetuser][search_type].store(userid, [friendname, friendnick, friendavatar, friendbio])
-    }  # iterate over each element finding relevant information
-    $hashfile = hashfile
+  def self.twitter_get_followers(session, hashfile, targetuser) # start function twitter_get_followers_selenium
+    if $diag  # if diag true, display error
+      puts "\t[Function]:: Entering twitter_get_followers"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::hashfile #{hashfile.to_s}"
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::targetuser #{targetuser}"
+    end  # end if block
+    begin  # Catch/Rescue block start
+      puts "\t[Function]:: Global Hashfile: " + $hashfile.to_s if $diag # if diag true, display error
+      $followerlist = []  # set default follower list
+      if $diag # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::$followerlist #{$followerlist}"
+        puts "\t[Function]:: Generated default global follower list"
+      end  # end if block
+      # extract details from followers
+      element = session.find_elements(:xpath, "//*[starts-with(@id, 'stream-item-user-')]")  # find userid element
+      puts "\t[Function]:: Found elements needed" if $diag # if diag true, display error
+      element.select do |everything|
+        puts "\t[Function]:: Iterating follower information" if $diag # if diag true, display error
+        userid = everything.attribute('data-item-id') # get user id from source
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::userid #{userid}" if $diag
+        friendnick = everything.find_element(:css,'div > div > div.ProfileCard-userFields > div > div > a'
+        ).attribute('href').to_s.gsub("https://twitter.com/", '')
+        if friendnick == ""; friendnick = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::friendnick #{friendnick}" if $diag
+        friendavatar = everything.find_element(:css, 'div > div > a > img').attribute('src')
+        if friendavatar == ""; friendavatar = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::friendavatar #{friendavatar}" if $diag
+        friendname = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > div > div > a').text
+        if friendname == ""; friendname = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::friendname #{friendname}" if $diag
+        friendbio = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > p').text
+        if friendbio == ""; friendbio = "Unknown" end  # set unknown to var if false
+        if $diag # if diag true, display error
+          puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::friendbio #{friendbio}"
+          puts "\t[Function]:: Create entry for followerlist"
+        end  # end if block
+        dataline = "\"#{userid}\",\"#{friendname}\",\"#{friendnick}\",\"#{friendbio}\""
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::dataline #{dataline}" if $diag
+        $followerlist.append(dataline)  # append data line to followerlist
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::$followerlist #{$followerlist}" if $diag
+        puts "\t[Function]:: Finished followerlist append" if $diag # if diag true, display error
+        hashfile[targetuser]['followers'].store(
+            userid.to_s, [
+              friendname.to_s,
+              friendnick.to_s,
+              friendavatar.to_s,
+              friendbio.to_s
+        ])  # store data variables in hash
+        puts "\t[Function]:: Finished hashfile " if $diag # if diag true, display error
+      end # iterate over each element finding relevant information
+      $hashfile = hashfile  # store hashfile to global hashfile var
+      # if diag true, display error
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_followers::$hashfile #{$hashfile.to_s}" if $diag
+    rescue => tgetfolerr  # Cat error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_get_followers fault: #{tgetfolerr}" if $diag
+    end   # Catch/Rescue block end
+    puts "\t[Function]:: Exiting twitter_get_followers" if $diag # if diag true, display error
   end  # close function twitter_get_followers_selenium
-  def self.twitter_get_following(filename, session, hashfile, targetuser,
-      search_type
-  )  # start function twitter_get_following_selenium
+  def self.twitter_get_following(session, hashfile, targetuser)  # start function twitter_get_following_selenium
+    puts "\t[Function]:: Entering twitter_get_following" if $diag # if diag true, display error
+    $followinglist = []  # set default followinglist
+    # if diag true, display error
+    puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::$followinglist #{$followinglist.to_s}" if $diag
     # extract details from following
-    element = session.find_elements(:xpath, "//*[starts-with(@id, 'stream-item-user-')]") # find userid element
-    element.select { |everything|
-      userid = everything.attribute('data-item-id')
-      friendnick = everything.find_element(:css,
-        'div > div > div.ProfileCard-userFields > div > div > a'
-      ).attribute('href').to_s.gsub("https://twitter.com/",'')
-      if friendnick.to_s == ""; friendnick = "Unknown" end
-      friendavatar = everything.find_element(:css, 'div > div > a > img').attribute('src')
-      if friendavatar.to_s == ""; friendavatar = "Unknown" end
-      friendname = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > div > div > a').text
-      if friendname.to_s == ""; friendname = "Unknown" end
-      friendbio = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > p').text
-      if friendbio.to_s == ""; friendbio = "Unknown" end
-      hashfile[targetuser][search_type].store(userid, [friendname, friendnick, friendavatar, friendbio])
-    }  # iterate over each element finding relevant information
+    puts "\t[Function]:: Created default followinglist" if $diag # if diag true, display error
+    begin  # Catch/Rescue block start
+      element = session.find_elements(:xpath, "//*[starts-with(@id, 'stream-item-user-')]") # find userid element
+      element.select do |everything|
+        userid = everything.attribute('data-item-id')  # get userid from source
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::userid #{userid}" if $diag
+        friendnick = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > div > div > a'
+        ).attribute('href').to_s.gsub("https://twitter.com/", '')  # set var from source
+        if friendnick.to_s == ""; friendnick = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::friendnick #{friendnick}" if $diag
+        friendavatar = everything.find_element(:css, 'div > div > a > img').attribute('src')  # set var from source
+        if friendavatar.to_s == ""; friendavatar = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::friendavatar #{friendavatar.to_s}" if $diag
+        # set var from source
+        friendname = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > div > div > a').text
+        if friendname.to_s == ""; friendname = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::friendname #{friendname.to_s}" if $diag
+        # set var from source
+        friendbio = everything.find_element(:css, 'div > div > div.ProfileCard-userFields > p').text
+        if friendbio.to_s == ""; friendbio = "Unknown" end  # set unknown to var if false
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::friendbio #{friendbio.to_s}" if $diag
+        puts "\t[Function]:: Create entry for followinglist" if $diag # if diag true, display error
+        dataline = "\"#{userid}\",\"#{friendname}\",\"#{friendnick}\",\"#{friendbio}\""  # create dataline
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::dataline #{dataline.to_s}" if $diag
+        $followinglist.append(dataline)  # append dataline to followinglist
+        # if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::$followinglist #{$followinglist.to_s}" if $diag
+        puts "\t[Function]:: Finished followerlist append" if $diag # if diag true, display error
+        hashfile[targetuser]['following'].store(
+            userid.to_s, [
+              friendname.to_s,
+              friendnick.to_s,
+              friendavatar.to_s,
+              friendbio.to_s
+        ])  # store data variables in hash
+        if $diag # if diag true, display error
+          puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::hashfile #{hashfile.to_s}"
+          puts "\t[Function]:: Finished hashlist append"
+        end  # end if block
+      end  # end do block
+    rescue => tgetfolerr  # Cat error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_get_following fault: #{tgetfolerr}" if $diag
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Exiting twitter_get_following" if $diag # if diag true, display error
     $hashfile = hashfile
+    if $diag # if diag true, display error
+      puts "\t\t[Variable]:: TwitterAuth::twitter_get_following::$hashfile #{$hashfile.to_s}"
+      puts "\t[Function]:: Exiting twitter_get_following"
+    end  # end if block
   end  # close function twitter_get_following_selenium
-  def self.default_hash(targetuser)  # start function default_hash
+  def self.default_hashes(targetuser, search_type) # start function default_hash
+    puts "\t[Function]:: Entering TwitterAuth::default_hashes" if $diag # if diag true, display error
     # identify if there is a file for a target to load from disk
-    hashlist = {}  # generate default hash variable
-    hashlist[targetuser] = {}  # assign hash with variable name
-    hashlist[targetuser][$searchtype] = {}  # assign hash with variable name
-    return hashlist  # return hashlist
+    begin  # Catch/Rescue block start
+      hashlist = {}  # generate default hash variable
+      hashlist[targetuser] = {}  # assign hash with variable name
+      if search_type == 'all'  # if query is all
+        hashlist[targetuser]['followers'] = {}  # assign hash with variable name
+        hashlist[targetuser]['following'] = {}  # assign hash with variable name
+      else  # else do other thing
+        hashlist[targetuser][search_type] = {}  # assign hash with variable name
+      end  # end if block
+      if $diag# if diag true, display error
+        puts "\t\t[Variable]:: TwitterAuth::default_hashes::hashlist #{hashlist.to_s}"
+        puts "\t[Function]:: Default hashlist is generated"
+      end  # end if block
+      return hashlist  # return hashlist
+    rescue => defhasherror  # Catch error to var
+      puts "\t\t[ERROR]:: TwitterAuth::default_hashes fault: #{defhasherror}" if $diag # if diag true, display error
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Exiting TwitterAuth::default_hashes" if $diag # if diag true, display error
   end  # close function default_hash
   def self.twitter_logoff_selenium(session)  # start function twitter_logoff_selenium
-    session.get("https://twitter.com/logout")  # request twitter logout page
-    session.find_element(:css, 'div > div > form > div.buttons > button').click  # send synthetic mouse click
-    session.find_element(:css,'.js-submit').click  # send synthetic mouse click
-    session.close  # close browser session
-    return  # return to calling process
+    puts "\t[Function]:: Entering TwitterAuth::twitter_logoff_selenium" if $diag # if diag true, display error
+    begin  # Catch/Rescue block start
+      session.get("https://twitter.com/logout")  # request twitter logout page
+      session.find_element(:css, 'div > div > form > div.buttons > button').click  # send synthetic mouse click
+      session.find_element(:css,'.js-submit').click  # send synthetic mouse click
+      session.close  # close browser session
+      puts "\t[Function]:: Logged off twitter" if $diag # if diag true, display error
+      return  # return to calling process
+    rescue => selnlogofferr  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: TwitterAuth::twitter_logoff_selenium fault: #{selnlogofferr}" if $diag
+    end  # Catch/Rescue block start
+    puts "\t[Function]:: Exiting TwitterAuth::twitter_logoff_selenium" if $diag # if diag true, display error
   end  # close function twitter_logoff_selenium
 end  # close class TwitterAuth
-########################################################################################################################
+#
+#[Class] ##################################] SeleniumWebHandler [#######################################################
 class SeleniumWebHandler  # start class SeleniumWebHandler
   def self.start_ff_driver  # start function start_ff_driver
+    puts "\t[Function]:: Entering SeleniumWebHandler::start_ff_driver" if $diag # if diag true, display error
     # Loads Firefox in headless mode
-    begin  # start begin loop
+    begin  # Catch/Rescue block start
       # EDIT ME BELOW TO MATCH YOU FILE LOCATIONS
       webdriver_path = File.join(File.absolute_path(File.dirname(
           "D:\\")),"webdriver", "geckodriver.exe"
       ) # set the location where the geckodriver is located, obviously edit to match your needs
+      puts "\t[Function]:: Finished loading browser driver" if $diag # if diag true, display error
       Selenium::WebDriver::Firefox.driver_path = webdriver_path  # set the geckodriver location in module
       driver = Selenium::WebDriver.for :firefox#, :profile => profile  # set the web browser web driver
+      puts "\t[Function]:: Return browser driver" if $diag # if diag true, display error
       return driver  # returns driver to application for later use
-    rescue => startfffail  # rescue any faults as variable
-      if @diag; puts "Failed to start FF Driver: #{startfffail}" end  # if diag true, display error
-    end  # close begin loop
+    rescue => startfffail  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: SeleniumWebHandler::start_ff_driver fault: #{startfffail}" if $diag
+    end    # Catch/Rescue block end
+    puts "\t[Function]:: Entering SeleniumWebHandler::start_ff_driver" if $diag # if diag true, display error
   end  # close function start_ff_driver
   def goto(url)  # start function goto
     # uses the GET function from selenium
-    @driver.get(url)  # request URl from headless browser session
-    @driver.find_element(:css, '#doc > div.topbar.js-topbar > div').click  # send synthetic mouse click
-  end  # close function goto
+    puts "\t[Function]:: Entering SeleniumWebHandler::goto" if $diag # if diag true, display error
+    puts "\t\t[Variable]:: SeleniumWebHandler::goto::url #{url.to_s}" if $diag # if diag true, display error
+    begin  # Catch/Rescue block start
+      @driver.get(url)  # request URl from headless browser session
+      puts "\t[Function]:: Grab URL" if $diag # if diag true, display error
+      @driver.find_element(:css, '#doc > div.topbar.js-topbar > div').click  # send synthetic mouse click
+      puts "\t[Function]:: Send synthetic click on form" if $diag # if diag true, display error
+    rescue => selgotoerr  # Catch error to var
+      puts "\t\t[ERROR]:: SeleniumWebHandler::goto fault: #{selgotoerr}" if $diag # if diag true, display error
+    end  # Catch/Rescue block end
+  end  # Close function goto
   def self.pagescroll(session)  # start function pagescroll
     # page source validation and break function
+    puts "\t[Function]:: Entering SeleniumWebHandler::pagescroll" if $diag # if diag true, display error
     @oldsource = ""  # sets variable with default value
+    # if diag true, display error
+    puts "\t\t[Variable]:: SeleniumWebHandler::pagescroll::@oldsource #{@oldsource.to_s}" if $diag
     # Scrolls a page till the end
-    begin  # start being loop
+    begin
       # iterate over a stupid number to ensure coverage
       500000000.times { |counter|
         sleep 0.5  # take a nap
         @counter = counter  # keep score
+        puts "\t\t[Variable]:: SeleniumWebHandler::pagescroll::@counter #{@counter.to_s}" if $diag
         session.execute_script("document.body.scrollTop")  # set scroll top value
         session.execute_script("window.innerHeight")  # set inner height of window
         session.execute_script("if (
@@ -164,104 +379,493 @@ else
 {return false}")  # execute script as JS in browser
         session.execute_script("window.scrollTo(0, document.body.scrollHeight)")  # execute script as JS in browser
         if source_page_check(session)  # if page has touched the bottom
+          puts "\t[Function]:: Entering source_page_check::BREAK" if $diag # if diag true, display error
           break  # exit the begin loop
         end  # end if statement
       }
-    rescue => pagescrollfail  # rescue any faults as variable
-      if @diag; puts "PageScroll failed: #{pagescrollfail}" end  # if diag true, display error
-    end  # stop being loop
-    return  # return to calling process
+      puts "\t[Function]:: Exiting SeleniumWebHandler::pagescroll" if $diag # if diag true, display error
+      return  # return to calling process
+    rescue => pagescrollfail  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: SeleniumWebHandler::pagescroll fault: #{pagescrollfail}" if $diag
+    end  # Catch/Rescue block end
   end  # close function pagescroll
   def self.teardown  # start function teardown
-     # breaks down the web driver and closes the browser
-     begin  # start begin loop
-       @driver.quit  # send driver QUIT signal
-     rescue => teardownfail  # rescue any faults as variable
-       if @diag; puts "Teardown Failed: #{teardownfail}" end  # if diag true, display error
-     end  # stop being loop
-     return  # return to calling process
+    puts "\t[Function]:: Entering SeleniumWebHandler::teardown" if $diag # if diag true, display error
+    # breaks down the web driver and closes the browser
+    begin  # Catch/Rescue block start
+      @driver.quit  # send driver QUIT signal
+      puts "\t[Function]:: Exiting SeleniumWebHandler::teardown" if $diag # if diag true, display error
+      return  # return to calling process
+    rescue => teardownfail  # Catch error to var
+      puts "\t\t[ERROR]:: SeleniumWebHandler::teardown fault: #{teardownfail}" if $diag # if diag true, display error
+    end  # Catch/Rescue block end
   end  # close function teardown
   def self.source_page_check(session)  # start function source_page_check
-     # Checks the source of a page to see if anything has changed
-     @newsource = session.page_source  # set variable with resulting page source
-     if @newsource == @oldsource  # compare the values of new vs old
+    # Checks the source of a page to see if anything has changed
+    puts "\t[Function]:: Entering SeleniumWebHandler::source_page_check" if $diag # if diag true, display error
+    begin  # Catch/Rescue block start
+      @newsource = session.page_source  # set variable with resulting page source
+      # if diag true, display error
+      puts "\t\t[Variable]:: SeleniumWebHandler::source_page_check::@newsource #{@newsource.to_s}" if $diag
+      if @newsource == @oldsource  # compare the values of new vs old
+        puts "\t[Function]:: new and old source matched" if $diag # if diag true, display error
         return true  # resulting in true
-     else  # if not, perform these other actions
+      else  # if not, perform these other actions
         @oldsource = @newsource  # set the old variable to the new variable
+        puts "\t[Function]:: new and old source DID NOT match" if $diag # if diag true, display error
         return false  # resulting in false
-     end  # end if statement
+      end  # end if block
+    rescue => teardownfail  # Catch error to var
+      # if diag true, display error
+      puts "\t\t[ERROR]:: SeleniumWebHandler::source_page_check fault: #{teardownfail}" if $diag
+    end  # Catch/Rescue block end
+    puts "\t[Function]:: Exiting SeleniumWebHandler::source_page_check" if $diag # if diag true, display error
   end  #close function source_page_check
 end  # close class SeleniumWebHandler
-############################################# FILE WRITER ##############################################################
-def filewriter(filename, hashfile, targetuser, search_type)
+#
+#[Function] ##################################] filewriter [############################################################
+def filewriter(filename, datatodisk, search_type)
+  if $diag # if diag true, display error
+    puts "\t[Function]:: Entering filewriter"
+    puts "\t\t[Variable]:: filewriter::filename #{filename.to_s}"
+    puts "\t\t[Variable]:: filewriter::datatodisk #{datatodisk.to_s}"
+    puts "\t\t[Variable]:: filewriter::search_type #{search_type.to_s}"
+  end  # end if block
   if filename  # if filename has been set, save userid to disk
-    File.open(search_type.to_s+"_"+filename.to_s, 'w') {|f|
-      f.puts(hashfile[targetuser][search_type].keys) }  # produce file
+    begin  # Catch/Rescue block start
+      if filename.split('.')[-1].to_s == "csv";  # check if file is csv extension
+        puts "file is csv";  # the file extension is csv
+      else  # do something else
+        filename = filename.to_s+".csv"  # the filename has been modified
+      end  # end if block
+    rescue => filewriteerr  # Catch error to var
+      puts "\t\t[ERROR]:: filewriter fault: #{filewriteerr}" if $diag # if diag true, display error
+    end  # Catch/Rescue block end
   end  # close if statement
-end
+  filename = search_type.to_s+"_"+filename.to_s
+  puts "\t\t[Variable]:: CSV filewriter::filename #{filename.to_s}" if $diag # if diag true, display error
+  begin  # Catch/Rescue block start
+    if $whitelist != ''  # if global $whitelist not blank
+      puts "\t\t[Variable]:: Whitelist filewriter::$whitelist #{$whitelist.to_s}" if $diag # if diag true, display error
+      filename = "whitelist_"+filename  # Create new filename
+      puts "\t\t[Variable]:: Whitelist filewriter::filename #{filename.to_s}" if $diag # if diag true, display error
+    end  # end if block
+    if $epoch != ''  # if global $epoch not blank
+      puts "\t\t[Variable]:: Epoch filewriter::$epoch #{$epoch.to_s}" if $diag # if diag true, display error
+      filename = "epoch_"+filename  # Create new filename
+      puts "\t\t[Variable]:: Epoch filewriter::filename #{filename.to_s}" if $diag # if diag true, display error
+    end  # end if block
+    File.open(filename, 'w') {|f|
+      f.puts(datatodisk) }  # produce file
+  rescue => filenamemod  # Catch error to var
+    puts "\t\t[ERROR]:: filewriter filename fault: #{filenamemod}" if $diag # if diag true, display error
+  end  # Catch/Rescue block end
+  puts "\t[Function]:: Exiting filewriter" if $diag # if diag true, display error
+end  # Close filewriter function
 #
-########################################## USER ARGUMENTS ##############################################################
-#
+#[User Arguments] ##############################] User Args [###########################################################
 require 'selenium-webdriver'  # ensure module is included with the script
 require 'optparse'  # ensure module is included with the script
 require 'ostruct'  # ensure module is included with the script
-@diag = false  # set diagnostics to FALSE, no verbose
 #
 # Take user arguments from commandline
 #
-options = OpenStruct.new  # create a new OpenStruct object
-OptionParser.new do |opt|
-  opt.on('-s','--search SEARCHTYPE','Types: ["following","followers","all"]') { |o|
-     options[:searchtype] = o }  # searchtype from arguments @ cli
-  opt.on('-t','--target PERSONALITY','Target twitter personality to produce list from') { |o|
-     options[:targetuser] = o }  # targetuser from arguments @ cli
-  opt.on('-o','--output FILENAME','The filename which to store the generated CSV list') { |o|
-     options[:filename] = o }  # filename from arguments @ cli
-  opt.on('-p','--password PASSWORD','Your twitter password for Authentication') { |o|
-     options[:password] = o }  # password from arguments @ cli
-  opt.on('-u','--username USERNAME','Your twitter username for Authentication') { |o|
-     options[:username] = o }  # username from arguments @ cli
-end.parse!
+begin  # Catch/Rescue block start
+  options = OpenStruct.new  # create a new OpenStruct object
+  OptionParser.new do |opt|
+    opt.on('-w','--whitelist SEARCHTYPE','Create whitelist from own Types: ["following","followers","all"]') { |o|
+      options[:whitelist] = o }  # create whitelist from commandline of known users who follow(ers|ing) you
+    opt.on('-e','--epoch SEARCHTYPE','List connections between users Types: ["following","followers","all"]') { |o|
+      options[:epoch] = o }  # create connection list from commandline of known users between you and target user
+    opt.on('-v','--verbose BOOLEAN','Writes additional CSV file with detailed information') { |o|
+      options[:verbose] = o }  # username from arguments @ cli
+    opt.on('-s','--search SEARCHTYPE','List users of target personality Types: ["following","followers","all"]') { |o|
+      options[:searchtype] = o }  # create list of users from targets follow(ers|ing)
+    opt.on('-t','--target PERSONALITY','Target twitter personality to produce list from') { |o|
+      options[:targetuser] = o }  # select target personality from commandline
+    opt.on('-o','--output FILENAME','The filename which to store the generated CSV list') { |o|
+      options[:filename] = o }  # filename to store created list
+    opt.on('-p','--password PASSWORD','Your twitter password for Authentication') { |o|
+      options[:password] = o }  # password from arguments @ cli
+    opt.on('-d','--debug BOOLEAN','Enable verbose debugging information to be displayed') { |o|
+      options[:debug] = o }  # username from arguments @ cli
+    opt.on('-u','--username USERNAME','Your twitter username for Authentication') { |o|
+      options[:username] = o }  # username from arguments @ cli
+  end.parse!  # Stop parsing options from user @ cli
+rescue => optparseerr  # catch error to va
+  puts "\t\t[ERROR]:: OptionsParser fault: #{optparseerr}" if $diag # if diag true, display error
+end  # Catch/Rescue block end
 #
-########################################### GLOBAL ARGUMENTS ###########################################################
-#
+#[Global Variables] ##############################] Global Vars [#######################################################
+if options.debug.to_s == ""
+  $diag = false
+end
+puts "[$GLOBAL] Diagnostic: #{$diag}" if $diag # if diag true, display error
+$whitelist  = options.whitelist.to_s  # set search type to global variable
+puts "[$GLOBAL] Whitelist: #{$whitelist}" if $diag # if diag true, display error
+$epoch      = options.epoch.to_s  # set search type to global variable
+puts "[$GLOBAL] Epochlist: #{$epoch}" if $diag # if diag true, display error
 $username   = options.username.to_s  # set username to global variable
+puts "[$GLOBAL] AUTHuser: #{$username}" if $diag # if diag true, display error
 $password   = options.password.to_s  # set password to global variable
+puts "[$GLOBAL] AUTHpass: #{$password}" if $diag # if diag true, display error
 $targetuser = options.targetuser.to_s  # set target user to global variable
+puts "[$GLOBAL] Targetuser: #{$targetuser}" if $diag # if diag true, display error
 $searchtype = options.searchtype.to_s  # set search type to global variable
+puts "[$GLOBAL] Searchtype:  #{$searchtype}" if $diag # if diag true, display error
 $filename   = options.filename.to_s  # set file name to global variable
+puts "[$GLOBAL] Filename:  #{$filename}" if $diag # if diag true, display error
+$verbose    = options.verbose.to_s  # sets verbose statement to global variable
+puts "[$GLOBAL] Verbose: #{$verbose}" if $diag # if diag true, display error
 $bsession   = SeleniumWebHandler.start_ff_driver  # start Firefox browser in headless mode
-$hashfile   = TwitterAuth.default_hash($targetuser)  # generate the default hash file
+puts "[$GLOBAL] Browser: Enabled" if $diag # if diag true, display error
 #
-################################################ START MAIN LOGIC ######################################################
+#[Function] #################################] followersquery [#########################################################
+def followersquery(queryuser)
+  puts "\t[Function]:: Entering followersquery" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: followersquery::queryuser #{queryuser.to_s}" if $diag # if diag true, display error
+  begin
+    # if diag true, display error
+    puts "\t[Function]:: Entering followersquery::TwitterAuth.twitter_user_followers" if $diag
+    TwitterAuth.twitter_user_followers($bsession, queryuser)  # request followers page
+    # if diag true, display error
+    puts "\t[Function]:: Exiting followersquery::TwitterAuth.twitter_user_followers" if $diag
+  rescue => tauferr
+    # if diag true, display error
+    puts "\t\t[ERROR]:: followersquery::TwitterAuth.twitter_user_followers fault: #{tauferr}" if $diag
+  end
+  begin
+    # if diag true, display error
+    puts "\t[Function]:: Entering followersquery::TwitterAuth.twitter_get_followers" if $diag
+    TwitterAuth.twitter_get_followers(
+        $bsession,
+        $hashfile,
+        queryuser)  # page scroll and gather followers information, stow in hash
+    # if diag true, display error
+    puts "\t[Function]:: Exiting followersquery::TwitterAuth.twitter_get_followers" if $diag
+  rescue => tagferr
+    # if diag true, display error
+    puts "\t\t[ERROR]:: followersquery::TwitterAuth.twitter_get_followers fault: #{tagferr}" if $diag
+  end
+  begin
+    if $whitelist == "";
+      targetuser = $targetuser
+    else
+      targetuser = $myusername
+    end
+    puts "\t\t[Variable]:: followersquery::targetuser #{targetuser.to_s}" if $diag # if diag true, display error
+  rescue => tuserseterr
+    puts "\t\t[ERROR]:: followersquery::targetuser fault: #{tuserseterr}" if $diag # if diag true, display error
+  end
+  begin
+    if $diag # if diag true, display error
+      puts "\t[Function]:: Entering followersquery::filewriter"
+      puts "\t\t[Variable]:: followersquery::filewriter::$filename #{$filename.to_s}"
+      puts "\t\t[Variable]:: followersquery::filewriter::$hashfile #{$hashfile.to_s}"
+    end
+    filewriter($filename, $hashfile[targetuser]['followers'].keys, 'followers')  # write list to disk
+    puts "\t[Function]:: Exiting followersquery::filewriter" if $diag # if diag true, display error
+  rescue => filewritererr
+    puts "\t\t[ERROR]:: followersquery::filewriter fault: #{filewritererr}" if $diag # if diag true, display error
+  end
+  begin
+    if $verbose
+      if $diag # if diag true, display error
+        puts "\t[Function]:: Entering Verbose followersquery::filewriter"
+        puts "\t\t[Variable]:: followersquery::filewriter::$filename #{$filename.to_s}"
+        puts "\t\t[Variable]:: followersquery::filewriter::$hashfile #{$hashfile.to_s}"
+      end
+      filewriter("verbose_"+$filename.to_s, $followerlist, 'followers')
+      puts "\t[Function]:: Exiting Verbose followersquery::filewriter" if $diag # if diag true, display error
+    end  # close if statement
+  rescue => verbosefileerr
+    # if diag true, display error
+    puts "\t\t[ERROR]:: Verbose followersquery::filewriter fault: #{verbosefileerr}" if $diag
+  end
+  puts "\t[Function]:: Exiting followersquery" if $diag # if diag true, display error
+end
 #
+#[Function] #################################] followingquery [#########################################################
+def followingquery(queryuser)
+  begin
+    if $diag # if diag true, display error
+      puts "\t[Function]:: Entering followingquery"
+      puts "\t\t[Variable]:: followingquery::queryuser #{queryuser}"
+      puts "\t[Function]:: Entering followingquery::TwitterAuth.twitter_user_following"
+    end
+    TwitterAuth.twitter_user_following($bsession, queryuser)  # request followers page
+    # if diag true, display error
+    puts "\t[Function]:: Exiting followingquery::TwitterAuth.twitter_user_following" if $diag
+  rescue => tawuferror
+    # if diag true, display error
+    puts "\t\t[ERROR]::followingquery::TwitterAuth.twitter_user_following fault: #{tawuferror}" if $diag
+  end
+  begin
+    # if diag true, display error
+    puts "\t[Function]:: Entering followingquery::TwitterAuth.twitter_get_following" if $diag
+    TwitterAuth.twitter_get_following(
+        $bsession,
+        $hashfile,
+        queryuser)  # page scroll and gather following information, stow in hash
+    # if diag true, display error
+    puts "\t[Function]:: Exiting followingquery::TwitterAuth.twitter_user_following" if $diag
+  rescue => tawgferror
+    # if diag true, display error
+    puts "\t\t[ERROR]:: followingquery::TwitterAuth.twitter_get_following fault: #{tawgferror}" if $diag
+  end
+  begin
+    if $whitelist == "";
+      targetuser = $targetuser
+    else
+      targetuser = $myusername
+    end
+    puts "\t\t[Variable]:: followingquery::targetuser #{targetuser}" if $diag # if diag true, display error
+  rescue => settusererror
+    puts "\t\t[ERROR]:: followingquery::targetuser fault: #{settusererror}" if $diag # if diag true, display error
+  end
+  begin
+    puts "\t[Function]:: Entering followingquery::filewriter" if $diag # if diag true, display error
+    filewriter($filename, $hashfile[targetuser]['following'].keys, 'following')  # write list to disk
+    puts "\t[Function]:: Exiting followingquery::filewriter " if $diag # if diag true, display error
+  rescue => filewriteerror
+    puts "\t\t[ERROR]:: followingquery::filewriter fault: #{filewriteerror}" if $diag # if diag true, display error
+  end
+  begin
+    if $verbose
+      puts "\t[Function]:: Entering Verbose followingquery::filewriter" if $diag # if diag true, display error
+      filewriter("verbose_"+$filename.to_s, $followinglist, 'following')
+      puts "\t[Function]:: Exiting Verbose followingquery::filewriter " if $diag # if diag true, display error
+    end  # close if statement
+  rescue => vfilewriteerror
+    puts "\t\t[ERROR]:: followingquery::Vfilewriter fault: #{vfilewriteerror}" if $diag # if diag true, display error
+  end
+  puts "\t[Function]:: Exiting followingquery" if $diag # if diag true, display error
+end
+#
+#[Function] ####################################] doallquery [##########################################################
+def doallquery(queryuser)
+  puts "\t[Function]:: Entering doallquery" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: doallquery::queryuser #{queryuser}" if $diag # if diag true, display error
+  begin
+    puts "\t[Function]:: Entering doallquery::followersquery" if $diag # if diag true, display error
+    followersquery(queryuser)
+    puts "\t[Function]:: Exiting doallquery::followersquery" if $diag # if diag true, display error
+  rescue => filewriteerror
+    puts "\t\t[ERROR]:: doallquery::followersquery fault: #{filewriteerror}" if $diag # if diag true, display error
+  end
+  begin
+    puts "\t[Function]:: Entering doallquery::followingquery" if $diag # if diag true, display error
+    followingquery(queryuser)
+    puts "\t[Function]:: Exiting doallquery::followingquery" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting doallquery" if $diag # if diag true, display error
+  rescue => filewriteerror
+    puts "\t\t[ERROR]:: doallquery::followingquery fault: #{filewriteerror}" if $diag # if diag true, display error
+  end
+  puts "\t[Function]:: Exiting doallquery" if $diag # if diag true, display error
+end
+#
+#[Function] #####################################] searchfun [##########################################################
+def searchfun(querytype, queryuser)
+  puts "\t[Function]:: Entering searchfun" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: searchfun::querytype #{querytype}" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: searchfun::queryuser #{queryuser}" if $diag # if diag true, display error
+  begin
+    if querytype.downcase.to_s == 'followers'  # if searching for followers only
+      puts "\t[Function]:: Entering searchfun::followersquery" if $diag # if diag true, display error
+      followersquery(queryuser)
+      puts "\t[Function]:: Exiting searchfun::followersquery" if $diag # if diag true, display error
+    end  # end if statement
+  rescue => followfault
+    puts "\t\t[ERROR]:: searchfun::followersquery fault: #{followfault}" if $diag # if diag true, display error
+  end
+  begin
+    if querytype.downcase.to_s == 'following'  # if searching for following only
+      puts "\t[Function]:: Entering searchfun::followingquery" if $diag # if diag true, display error
+      followingquery(queryuser)
+      puts "\t[Function]:: Exiting searchfun::followingquery" if $diag # if diag true, display error
+    end  # end if statement
+  rescue => followfault
+    puts "\t\t[ERROR]:: searchfun::followingquery fault: #{followfault}" if $diag # if diag true, display error
+  end
+  begin
+    if querytype.downcase.to_s == 'all'  # if searching for all
+      puts "\t[Function]:: Entering searchfun::doallquery" if $diag # if diag true, display error
+      doallquery(queryuser)
+      puts "\t[Function]:: Exiting searchfun::doallquery" if $diag # if diag true, display error
+    end  # end if statement
+  rescue => followfault
+    puts "\t\t[ERROR]:: searchfun::doallquery fault: #{followfault}" if $diag # if diag true, display error
+  end
+  puts "\t[Function]:: Exiting searchfun" if $diag # if diag true, display error
+end
+#
+#[Function] #####################################] genwhitelist [#######################################################
+def genwhitelist
+  puts "\t[Function]:: Entering genwhitelist" if $diag # if diag true, display error
+  puts "\t[Function]:: Starting genwhitelist::TwitterAuth.twitter_get_selfinfo" if $diag # if diag true, display error
+  begin
+    puts "\t\t[Variable]:: genwhitelist::$whitelist #{$whitelist}" if $diag # if diag true, display error
+    $myusername = TwitterAuth.twitter_get_selfinfo($bsession)
+    puts "\t\t[Variable]:: genwhitelist::$myusername #{$myusername}" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting genwhitelist::TwitterAuth.twitter_get_selfinfo" if $diag # if diag true, display error
+  rescue => setvarerror
+    # if diag true, display error
+    puts "\t\t[ERROR]:: genwhitelist::TwitterAuth.twitter_get_selfinfo fault: #{setvarerror}" if $diag
+  end
+  begin
+    puts "\t[Function]:: Starting genwhitelist::TwitterAuth.default_hashes" if $diag # if diag true, display error
+    $hashfile   = TwitterAuth.default_hashes($myusername, $whitelist)  # generate the default hash file
+    puts "\t\t[Variable]:: genwhitelist::$hashfile #{$hashfile.to_s}" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting genwhitelist::TwitterAuth.default_hashes" if $diag # if diag true, display error
+  rescue => setvarerror
+    # if diag true, display error
+    puts "\t\t[ERROR]:: genwhitelist::TwitterAuth.default_hashes fault: #{setvarerror}" if $diag
+  end
+  begin
+    puts "\t[Function]:: Starting genwhitelist::searchfun" if $diag # if diag true, display error
+    searchfun($whitelist, $myusername)
+    puts "\t[Function]:: Exiting genwhitelist::searchfun" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting genwhitelist" if $diag # if diag true, display error
+  rescue => setvarerror
+    puts "\t\t[ERROR]:: genwhitelist::searchfun fault: #{setvarerror}" if $diag # if diag true, display error
+  end
+  exit
+end
+#
+#[Function] #########################################] genepoch [#######################################################
+def genepoch
+  puts "\t[Function]:: Entering genepoch" if $diag # if diag true, display error
+  begin
+    puts "\t[Function]:: Starting genepoch::TwitterAuth.twitter_get_selfinfo" if $diag # if diag true, display error
+    puts "\t\t[Variable]:: genepoch::$epoch #{$epoch}" if $diag # if diag true, display error
+    $myusername = TwitterAuth.twitter_get_selfinfo($bsession)
+    puts "\t\t[Variable]:: genepoch::$myusername #{$myusername}" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting genwhitelist::TwitterAuth.twitter_get_selfinfo" if $diag # if diag true, display error
+  rescue => setvarerror
+    # if diag true, display error
+    puts "\t\t[ERROR]:: genepoch::TwitterAuth.twitter_get_selfinfo fault: #{setvarerror}" if $diag
+  end
+  begin
+    puts "\t[Function]:: Starting genepoch::TwitterAuth.default_hashes" if $diag # if diag true, display error
+    $hashfile   = TwitterAuth.default_hashes($myusername, $epoch)  # generate the default hash file
+    puts "\t\t[Variable]:: genepoch::$hashfile #{$hashfile.to_s}" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting genepoch::TwitterAuth.default_hashes" if $diag # if diag true, display error
+  rescue => setvarerror
+    # if diag true, display error
+    puts "\t\t[ERROR]:: genepoch::TwitterAuth.default_hashes fault: #{setvarerror}" if $diag
+  end
+  begin
+    puts "\t[Function]:: Starting genepoch::searchfun" if $diag # if diag true, display error
+    searchfun($epoch, $myusername)
+    $whashfile = $hashfile[$myusername]
+    puts "\t[Function]:: Exiting genepoch::searchfun" if $diag # if diag true, display error
+    puts "\t\t[Variable]:: genepoch::$whashfile #{$whashfile.to_s}" if $diag # if diag true, display error
+  rescue => setvarerror
+    puts "\t\t[ERROR]:: genepoch::searchfun fault: #{setvarerror}" if $diag # if diag true, display error
+  end
+  begin
+    puts "\t[Function]:: Starting genepoch::TwitterAuth.default_hashes" if $diag # if diag true, display error
+    $hashfile  = TwitterAuth.default_hashes($targetuser, $epoch)  # generate the default hash file
+    puts "\t\t[Variable]:: genepoch::$whashfile #{$whashfile.to_s}" if $diag # if diag true, display error
+    puts "\t[Function]:: Exiting genepoch::TwitterAuth.default_hashes" if $diag # if diag true, display error
+  rescue => setvarerror
+    puts "\t\t[ERROR]:: genepoch::searchfun user fault: #{setvarerror}" if $diag # if diag true, display error
+  end
+  begin
+    puts "\t[Function]:: Starting genepoch::searchfun" if $diag # if diag true, display error
+    searchfun($searchtype, $targetuser)
+    puts "\t[Function]:: Exiting genepoch::searchfun" if $diag # if diag true, display error
+    $bhashfile = $hashfile[$targetuser]
+    puts "\t\t[Variable]:: genepoch::$bhashfile #{$bhashfile.to_s}" if $diag # if diag true, display error
+  rescue => setvarerror
+    puts "\t\t[ERROR]:: genepoch::searchfun tuser fault: #{setvarerror}" if $diag # if diag true, display error
+  end
+  begin
+    $whashfile.keys.each { |wmkey|
+      puts "\t\t[Variable]:: genepoch::wmkey #{wmkey}" if $diag # if diag true, display error
+      $whashfile[wmkey].keys.each { |wmwkey|
+        puts "\t\t[Variable]:: genepoch::wmwkey #{wmwkey}" if $diag # if diag true, display error
+        $bhashfile.keys.each { |bhashkey |
+          if $bhashfile[bhashkey].include? wmwkey  # Is the variable found in the keys list
+            suser = $whashfile[wmkey][wmwkey][1]  # username of shared account between target personalities
+            puts "\t\t[LOGIC]:: genepoch::found user #{suser} in target #{$targetuser}'s #{bhashkey} list"
+          end  # end if block
+        }  # end $bhashfile[bhashkey].include each block
+      }  # end $whashfile[wmkey].keys.eac each block
+    }  # end $whashfile.keys.each block
+  rescue => setvarerror
+    puts "\t\t[ERROR]:: genepoch::searchfun process fault: #{setvarerror}" if $diag # if diag true, display error
+  end
+  puts "\t[Function]:: Exiting genepoch" if $diag # if diag true, display error
+  exit
+end
+#
+#[Main] #############################################] Main [###########################################################
 begin
+  if $diag # if diag true, display error
+    puts "\t[Function]:: Entering MAIN"
+    puts "\t[Function]:: Starting MAIN TwitterAuth.twitter_login_selenium"
+    puts "\t\t[Variable]:: TwitterAuth.twitter_login_selenium::$username #{$username}"
+    puts "\t\t[Variable]:: TwitterAuth.twitter_login_selenium::$password #{$password}"
+  end
   TwitterAuth.twitter_login_selenium($bsession, $username, $password)  # log into the twitter web application
-  TwitterAuth.twitter_userinfo($bsession, $targetuser)  # get target personality information from page
-  TwitterAuth.twitter_get_userinfo($bsession, $hashfile, $targetuser, $searchtype)  # process personality info & stow
-  if $searchtype.downcase.to_s == 'followers'  # if searching for followers only
-    TwitterAuth.twitter_user_followers($bsession, $targetuser)  # request followers page
-    TwitterAuth.twitter_get_followers($filename, $bsession, $hashfile, $targetuser, $searchtype
-    )  # page scroll and gather followers information, stow in hash
-    filewriter($filename, $hashfile, $targetuser, $searchtype)  # write list to disk
-  end  # end if statement
-  if $searchtype.downcase.to_s == 'following'  # if searching for following only
-    TwitterAuth.twitter_user_following($bsession, $targetuser)  # request followers page
-    TwitterAuth.twitter_get_following($filename, $bsession, $hashfile, $targetuser, $searchtype
-    )  # page scroll and gather following information, stow in hash
-    filewriter($filename, $hashfile, $targetuser, $searchtype)  # write list to disk
-  end  # end if statement
-  if $searchtype.downcase.to_s == 'all'  # if searching for all
-    TwitterAuth.twitter_user_followers($bsession, $targetuser)  # request followers page
-    TwitterAuth.twitter_get_followers($filename, $bsession, $hashfile, $targetuser, $searchtype
-    )  # page scroll and gather followers information, stow in hash
-    filewriter($filename, $hashfile, $targetuser, 'followers')  # write list to disk
-    TwitterAuth.twitter_user_following($bsession, $targetuser)  # request following page
-    TwitterAuth.twitter_get_following($filename, $bsession, $hashfile, $targetuser, $searchtype
-    )  # page scroll and gather following information, stow in hash
-    filewriter($filename, $hashfile, $targetuser, 'following')  # write list to disk
-  end  # end if statement
-rescue => mainfailed  # rescue any faults with parsing
-  puts "Application Failed: #{mainfailed}"  # display error
+  if $diag # if diag true, display error
+    puts "\t\t[Variable]:: BLANKED TwitterAuth.twitter_login_selenium::$username #{$username}"
+    puts "\t\t[Variable]:: BLANKED TwitterAuth.twitter_login_selenium::$password #{$password}"
+    puts "\t[Function]:: Exiting MAIN TwitterAuth.twitter_login_selenium"
+  end
+rescue => twlogserr  # rescue any faults with parsing
+  # if diag true, display error
+  puts "\t\t[ERROR]:: MAIN TwitterAuth.twitter_login_selenium fault: #{twlogserr}" if $diag
 end  # stop being loop
-################################################# THE END ##############################################################
+begin
+  puts "\t[Function]:: Starting MAIN TwitterAuth.twitter_userinfo" if $diag # if diag true, display error
+  # if diag true, display error
+  puts "\t\t[Variable]:: TwitterAuth.twitter_userinfo::$targetuser #{$targetuser}" if $diag
+  TwitterAuth.twitter_userinfo($bsession, $targetuser)  # get target personality information from page
+  puts "\t[Function]:: Exiting MAIN TwitterAuth.twitter_userinfo" if $diag # if diag true, display error
+rescue => twuserinferr  # rescue any faults with parsing
+  puts "\t\t[ERROR]:: MAIN TwitterAuth.twitter_userinfo fault: #{twuserinferr}" if $diag # if diag true, display error
+end  # stop being loop
+begin
+  puts "\t[Function]:: Starting MAIN genwhitelist" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: $whitelist #{$whitelist}" if $diag # if diag true, display error
+  genwhitelist if $whitelist.downcase.to_s != '' # end if statement
+  puts "\t[Function]:: Exiting MAIN genwhitelist" if $diag # if diag true, display error
+rescue => gelisterr  # rescue any faults with parsing
+  puts "\t\t[ERROR]:: MAIN genwhitelist fault: #{gelisterr}" if $diag # if diag true, display error
+end  # stop being loop
+begin
+  puts "\t[Function]:: Starting MAIN genepoch" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: $epoch #{$epoch}" if $diag # if diag true, display error
+  genepoch if $epoch.downcase.to_s != '' # end if statement
+  puts "\t[Function]:: Exiting MAIN genepoch" if $diag # if diag true, display error
+rescue => genepocherr  # rescue any faults with parsing
+  puts "\t\t[ERROR]:: MAIN genepoch fault: #{genepocherr}" if $diag # if diag true, display error
+end  # stop being loop
+begin
+  if $diag # if diag true, display error
+    puts "\t[Function]:: Starting MAIN TwitterAuth.twitter_get_userinfo"
+    puts "\t\t[Variable]:: TwitterAuth.twitter_get_userinfo::$hashfile #{$hashfile.to_s}"
+    puts "\t\t[Variable]:: TwitterAuth.twitter_get_userinfo::$targetuser #{$targetuser}"
+    puts "\t\t[Variable]:: TwitterAuth.twitter_get_userinfo::$searchtype #{$searchtype}"
+  end
+  TwitterAuth.twitter_get_userinfo($bsession, $hashfile, $targetuser, $searchtype)  # process personality info & stow
+  puts "\t[Function]:: Exiting MAIN TwitterAuth.twitter_get_userinfo" if $diag # if diag true, display error
+rescue => twuerinferr  # rescue any faults with parsing
+  # if diag true, display error
+  puts "\t\t[ERROR]:: MAIN process TwitterAuth.twitter_get_userinfo: #{twuerinferr}" if $diag
+end  # stop being loop
+begin
+  puts "\t[Function]:: Starting MAIN searchfun" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: searchfun::$searchtype #{$searchtype}" if $diag # if diag true, display error
+  puts "\t\t[Variable]:: searchfun::$targetuser #{$targetuser}" if $diag # if diag true, display error
+  searchfun($searchtype, $targetuser) if $searchtype.downcase.to_s != '' # end if statement
+  puts "\t[Function]:: Exiting MAIN searchfun" if $diag # if diag true, display error
+rescue => serfunerr  # rescue any faults with parsing
+  puts "\t\t[ERROR]:: MAIN searchfun fault: #{serfunerr}" if $diag # if diag true, display error
+end  # stop being loop
+puts "\t[Function]:: Exiting MAIN" if $diag # if diag true, display error
+#
+#[END] ###########################################] The End [###########################################################
