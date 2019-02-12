@@ -48,9 +48,9 @@ EXE
   C:\Echo_Chamber.exe -s following -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
   C:\Echo_Chamber.exe -s followers -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
   C:\Echo_Chamber.exe -s all -t someuser -o someuser.csv -p 'toughpassword' -u 'easyusername'
-  C:\ruby Echo_Chamber.exe -w all -p 'toughpassword' -u 'easyusername' -o whitelisted_names.csv
-  C:\ruby Echo_Chamber.exe -e all -t someuser -p 'toughpassword' -u 'easyusername' -v true -o epoch_names.csv
-  C:\ruby Echo_Chamber.exe -e all -t someuser -p 'toughpassword' -u 'easyusername' -v true -o epoch_names.csv -d true
+  C:\Echo_Chamber.exe -w all -p 'toughpassword' -u 'easyusername' -o whitelisted_names.csv
+  C:\Echo_Chamber.exe -e all -t someuser -p 'toughpassword' -u 'easyusername' -v true -o epoch_names.csv
+  C:\Echo_Chamber.exe -e all -t someuser -p 'toughpassword' -u 'easyusername' -v true -o epoch_names.csv -d true
 ```
 
 ### Example on Windows:
