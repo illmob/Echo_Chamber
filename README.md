@@ -29,7 +29,7 @@ Echo_Chamber [options]
 Echo_Chamber can be used to generate whitelist of your own followers/following/all to better aid in the prevention of blocked accounts.
 This should be used to diff between the blocklist generated from Echo_Chamber. You can use GNU diff or any other method you prefer.
 
-Can be used to identify cohersion between following and followers of the authenticated accountie: targeting ones own twitter ID. 
+Can be used to identify cohersion between following and followers of the authenticated account by targeting ones own twitter ID. 
 This can help identify users who you may want to block or permit. This can as well be useful to see where your post might 
 be consumed first (time line impressions) for rapid retweets. This can be done using the -t switch and your own identity.
 
